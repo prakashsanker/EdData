@@ -81,10 +81,6 @@ defer db.Close()
 					stmt7.Exec(splitStr[2])
 				}
 			}
-
-
-
-
 		}
 	}
 
