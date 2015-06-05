@@ -77,20 +77,44 @@ defer db.Close()
 			}
 	}
 
-	// content, err = ioutil.ReadFile("expenditureTypes.csv")
-	// lines := strings.Split(string(content), "\r")
+	content, err = ioutil.ReadFile("expenditureTypes.csv")
+	lines = strings.Split(string(content), "\r")
 
-	// for i, line := range lines {
-	// 	if i > 1 {
-	// 		splitStr := strings.Split(line, ",")
-	// 		if splitStr[2] != "" {
-	// 			_, err := db.Exec("INSERT INTO expenditure_types(name, code) VALUES(?, ?) ", splitStr[2], splitStr[3])
-	// 			check(err)
-	// 		}
+	for i, line := range lines {
+		var expenseId int64
+		if i > 1 {
+			splitStr := strings.Split(line, ",")
+			if splitStr[2] != "" {
+				var existingId int64
+				existingId = -1
+				rows, _ := db.Query("SELECT id FROM expenditure_types WHERE EXISTS (SELECT * FROM expenditure_types where code=?)", splitStr[3])
+				for rows.Next() {
+					err := rows.Scan(&existingId)
+					check(err)
+				}
+				if existingId == -1 {
+					res, err := db.Exec("INSERT INTO expenditure_types(name, code) VALUES(?, ?) ", splitStr[2], splitStr[3])
+					expenseId1, e := res.LastInsertId()
+					check(e)
+					check(err)
+					expenseId = expenseId1
+				} else {
+					expenseId = existingId
+				}
 
-	// 		rows, _ := db.Query("SELECT id from sub_activities WHERE activity_id=?", )
-	// 	}
-	// }
+			}
+
+			rows, _ := db.Query("SELECT id from sub_activities WHERE code=?", splitStr[0])
+			var activityId int
+			for rows.Next() {
+				err := rows.Scan(&activityId)
+				fmt.Println(splitStr[4])
+				check(err)
+				_, err = db.Exec("INSERT INTO activity_expenditure_types(district_id, sub_activity_id, expense_id, restricted, unrestricted) VALUES(?,?,?,?,?)", districtId, activityId,expenseId , splitStr[4], splitStr[5])
+				check(err)
+			}
+		}
+	}
 
 
 
