@@ -79,44 +79,58 @@ defer db.Close()
 
 	content, err = ioutil.ReadFile("expenditureTypes.csv")
 	lines = strings.Split(string(content), "\r")
+	savedSubActivityCode := "";
 
 	for i, line := range lines {
 		var expenseId int64
-		if i > 1 {
+		if i >= 1 {
 			splitStr := strings.Split(line, ",")
 			if splitStr[2] != "" {
 				var existingId int64
 				existingId = -1
-				rows, _ := db.Query("SELECT id FROM expenditure_types WHERE EXISTS (SELECT * FROM expenditure_types where code=?)", splitStr[3])
+				rows, _ := db.Query("SELECT id FROM expenditure_types WHERE code=?", splitStr[2])
 				for rows.Next() {
 					err := rows.Scan(&existingId)
 					check(err)
 				}
 				if existingId == -1 {
-					res, err := db.Exec("INSERT INTO expenditure_types(name, code) VALUES(?, ?) ", splitStr[2], splitStr[3])
-					expenseId1, e := res.LastInsertId()
-					check(e)
+					_, err := db.Exec("INSERT INTO expenditure_types(name, code) VALUES(?, ?) ", splitStr[3], splitStr[2])
 					check(err)
-					expenseId = expenseId1
+					rows, err = db.Query("SELECT id from expenditure_types where code=?", splitStr[2])
+					check(err)
+					for rows.Next() {
+						err := rows.Scan(&expenseId)
+						check(err)
+					}
 				} else {
 					expenseId = existingId
 				}
 
+			if (len(splitStr[0]) != 0) {
+				savedSubActivityCode = splitStr[0]
+			} 
+			if (len(splitStr[0]) == 0 && savedSubActivityCode == "") {
+				savedSubActivityCode = splitStr[0]
+			}
+			rows, err := db.Query("SELECT id from sub_activities WHERE code=?", savedSubActivityCode)
+			check(err)
+			for rows.Next() {
+				var subActivityId int64
+				err := rows.Scan(&subActivityId)
+				check(err)
+				_, err = db.Exec("INSERT INTO activity_expenditure_types(district_id, sub_activity_id, expense_id, restricted, unrestricted) VALUES(?,?,?,?,?)", districtId, subActivityId,expenseId , splitStr[4], splitStr[5])
+				check(err)	
 			}
 
-			rows, _ := db.Query("SELECT id from sub_activities WHERE code=?", splitStr[0])
-			var activityId int
-			for rows.Next() {
-				err := rows.Scan(&activityId)
-				fmt.Println(splitStr[4])
-				check(err)
-				_, err = db.Exec("INSERT INTO activity_expenditure_types(district_id, sub_activity_id, expense_id, restricted, unrestricted) VALUES(?,?,?,?,?)", districtId, activityId,expenseId , splitStr[4], splitStr[5])
-				check(err)
+
+
+
 			}
+
+
+
 		}
 	}
-
-
 
 }
 
