@@ -2,7 +2,7 @@ package main
 
 type District struct {
 	Id int64 `json: "id"`
-	Activities string `json: "activities"`
+	Name string `json: "name"`
 }
 
 type Districts []District

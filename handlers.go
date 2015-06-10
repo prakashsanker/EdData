@@ -23,18 +23,19 @@ func getDistrict(w http.ResponseWriter, r *http.Request) {
 func getDistricts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	rows, err := db.Query("SELECT id from districts")
+	rows, err := db.Query("SELECT * from districts")
 	check(err)
 	var district District
+	var districts Districts
 	for rows.Next() {
 		var id int64
-		err := rows.Scan(&id)
+		var name string
+		err := rows.Scan(&id, &name)
 		check(err)
-		test := "hey"
-		district = District{Id: id, Activities: test}
+		district = District{Id: id, Name: name}
+		districts = append(districts, district)
 	}
-
-	if err := json.NewEncoder(w).Encode(district); err != nil {
+	if err := json.NewEncoder(w).Encode(districts); err != nil {
 		check(err)
 	}
 
