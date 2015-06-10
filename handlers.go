@@ -23,11 +23,13 @@ func getDistrict(w http.ResponseWriter, r *http.Request) {
 func getDistricts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	rows, err := db.Query("SELECT * from districts")
+	rows, err := db.Query("SELECT id from districts")
 	check(err)
 	var district District
 	for rows.Next() {
 		var id int64
+		err := rows.Scan(&id)
+		check(err)
 		test := "hey"
 		district = District{Id: id, Activities: test}
 	}
