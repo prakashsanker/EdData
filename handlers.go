@@ -17,7 +17,21 @@ func Index(w http.ResponseWriter, r *http.Request) {
 func getDistrict(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	districtId := vars["districtId"]
-	fmt.Fprintln(w, "District id : ", districtId)
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	rows, err := db.Query("SELECT * from districts WHERE id=?", districtId)
+	check(err)
+	var district District
+	for rows.Next() {
+		var name string
+		var id int64
+		err := rows.Scan(&id, &name)
+		check(err)
+		district = District{Id: id, Name: name}
+	}
+	if err := json.NewEncoder(w).Encode(district); err != nil {
+		check(err)
+	}
 }
 
 func getDistricts(w http.ResponseWriter, r *http.Request) {
@@ -38,8 +52,6 @@ func getDistricts(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(districts); err != nil {
 		check(err)
 	}
-
-
 }
 
 func check(e error) {
