@@ -48,6 +48,14 @@ defer db.Close()
 				activityCode = splitStr[0]
 				_, err := db.Exec("INSERT INTO activities(code, name) VALUES(?, ?)", splitStr[0], splitStr[1])
 				check(err)
+				rows, err := db.Query("SELECT id from activities where code = ?", activityCode)
+				check(err)
+				for rows.Next() {
+					var activityId int
+					rows.Scan(&activityId)
+					_, err = db.Exec("INSERT INTO activity_expenditure(district_id, activity_id, expenditure) VALUES(?,?,?)", districtId, activityId, splitStr[len(splitStr) - 1])
+					check(err)
+				}
 			} else {
 				//this is a sub activity
 				check(err)
