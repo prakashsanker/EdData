@@ -87,8 +87,8 @@ var routes = Routes{
 	Route {
 		"getExpenses",
 		"GET",
-		"/district/{districtId}/subActivities/{subActivityCode/expenses",
-		getExpenses
-	}
+		"/district/{districtId}/subActivities/{subActivityCode}/expenses",
+		getExpenses,
+	},
 
 }

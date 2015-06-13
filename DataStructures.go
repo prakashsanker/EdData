@@ -22,9 +22,13 @@ type SubActivity struct {
 }
 
 type Expense struct {
-
-
+	Id int64 `json: "id"`
+	Code string `json: "code"`
+	Name string `json: "name"`
+	RestrictedExpenditure string `json: "restricted"`
+	UnrestrictedExpenditure string `json: "unrestricted"`
 }
 
 type Activities []Activity
 type SubActivities []SubActivity
+type Expenses []Expense

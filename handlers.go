@@ -7,14 +7,54 @@ import (
     "encoding/json"
 )
 
+//this file really really really really really needs refactoring. 
+
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "WELCOME!")
 }
 
 func getExpenses(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	districtId := vars["districtId"]
+	subActivityCode := vars["subActivityCode"]
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	rows, err := db.Query("SELECT id from sub_activities where code=?", subActivityCode)
+	check(err)
+	var expense Expense
+	var expenses Expenses
+	for rows.Next() {
+		var subActivityId int64
+		err := rows.Scan(&subActivityId)
+		check(err)
+		subActivityRows, err := db.Query("SELECT expense_id, restricted, unrestricted from activity_expenditure_types where district_id=? AND  sub_activity_id=?", districtId, subActivityId)
+		check(err)
+		for subActivityRows.Next() {
+			var expenseId int64
+			var restricted string
+			var unrestricted string
+			err := subActivityRows.Scan(&expenseId, &restricted, &unrestricted)
+			check(err)
+			expenseRows, err := db.Query("SELECT name, code FROM expenditure_types where id=?", expenseId)
+			check(err)
+			for expenseRows.Next() {
+				var name string
+				var code string
+				err := expenseRows.Scan(&name, &code)
+				check(err)
+				expense = Expense{Id: expenseId, RestrictedExpenditure: restricted, UnrestrictedExpenditure: unrestricted, Name: name, Code: code}
+				expenses = append(expenses, expense)
+			}
+		}
 
-	
+	}
+
+	if err := json.NewEncoder(w).Encode(expenses); err != nil {
+		check(err)
+	}
+
+
 }
 
 func getSubActivity(w http.ResponseWriter, r *http.Request) {
