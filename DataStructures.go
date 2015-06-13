@@ -10,7 +10,21 @@ type Districts []District
 type Activity struct {
 	Id int64 `json: "id"`
 	Code string `json: "code"`
-	Expenditure float64 `json: "expenditure" `
+	Expenditure string `json: "expenditure" `
+	Name string `json : "name"`
+}
+
+type SubActivity struct {
+	Id int64 `json: "id"`
+	Code string `json: "code"`
+	Expenditure string `json: "expenditure"`
+	Name string `json: "name"`
+}
+
+type Expense struct {
+
+
 }
 
 type Activities []Activity
+type SubActivities []SubActivity

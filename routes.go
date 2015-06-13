@@ -30,7 +30,6 @@ func NewRouter() *mux.Router {
 		log.Fatal("Error:", err.Error())
 	}
 
-
 	router := mux.NewRouter().StrictSlash(true)
 	for _, route := range routes {
 		router.
@@ -61,4 +60,35 @@ var routes = Routes{
 		"/districts",
 		getDistricts,
 	},
+	Route {
+		"getDistrictActivities",
+		"GET",
+		"/district/{districtId}/activities",
+		getDistrictActivities,
+	},
+	Route {
+		"getDistrictActivity",
+		"GET",
+		"/district/{districtId}/activities/{activityCode}",
+		getDistrictActivity,
+	},
+	Route {
+		"getSubActivities",
+		"GET",
+		"/district/{districtId}/activities/{activityCode}/subActivities",
+		getSubActivities,
+	},
+	Route {
+		"getSubActivity",
+		"GET",
+		"/district/{districtId}/subActivities/{subActivityCode}",
+		getSubActivity,
+	},
+	Route {
+		"getExpenses",
+		"GET",
+		"/district/{districtId}/subActivities/{subActivityCode/expenses",
+		getExpenses
+	}
+
 }

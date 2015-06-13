@@ -28,7 +28,7 @@ defer db.Close()
 	lines := strings.Split(string(content), "\r")
 
 	//only work so long as I have one district
-	rows, err := db.Query("SELECT id FROM districts")
+	rows, err := db.Query("SELECT id FROM districts where name=?", "SanFrancisco")
 	var districtId int
 	defer rows.Close()
 
