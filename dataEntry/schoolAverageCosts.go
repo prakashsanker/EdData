@@ -11,8 +11,8 @@ import(
 
 func main() {
 	db, err := sql.Open("mysql", "psanker:123@/education_data")
-	err = db.Pin()
-	db.setMaxOpenConns(0)
+	err = db.Ping()
+	db.SetMaxOpenConns(0)
 
 	check(err)
 
@@ -30,13 +30,29 @@ func main() {
 		check(err)
 		defer rows.Close()
 
-		for _, rows := range(lines) {
-			if i > 1 {
+		for i, row := range(lines) {
+			if i > 0 {
 				line := strings.TrimSpace(row)
 				splitStr := strings.Split(line, ",")
-				
+				schoolName := splitStr[3]
+				schoolRow, err := db.Query("SELECT id from schools where name=?", schoolName)
+				check(err)
+				hasNextRow := schoolRow.Next()
+				if hasNextRow {
+					//is a valid school
+					var id int
+					err = schoolRow.Scan(&id)
+					_, err = db.Exec("INSERT INTO school_expenses(school_id, expenditure, current_expense_ada, current_expense_per_ada) VALUES(?,?,?,?)", id, splitStr[4], splitStr[5], splitStr[6])
+					check(err)
+				}
+				schoolRow.Close()
 			}
 		}
 	}
+}
 
+func check(e error) {
+    if e != nil {
+        panic(e)
+    }
 }
