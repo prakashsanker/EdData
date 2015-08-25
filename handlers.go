@@ -18,7 +18,7 @@ func getExpenses(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	districtId := vars["districtId"]
 	subActivityCode := vars["subActivityCode"]
-	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")	
 	w.WriteHeader(http.StatusOK)
 	rows, err := db.Query("SELECT id from sub_activities where code=?", subActivityCode)
 	check(err)
@@ -61,7 +61,7 @@ func getSubActivity(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	districtId := vars["districtId"]
 	subActivityCode := vars["subActivityCode"]
-	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")	
 	w.WriteHeader(http.StatusOK)
 	rows, err := db.Query("SELECT id, name from sub_activities where code=?", subActivityCode)
 	check(err)
@@ -90,7 +90,7 @@ func getSubActivities(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	districtId := vars["districtId"]
 	activityCode := vars["activityCode"]
-	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")	
 	w.WriteHeader(http.StatusOK)
 	activityRows, err := db.Query("SELECT id from activities where code=?", activityCode)
 	var activityId int64
@@ -128,7 +128,7 @@ func getDistrictActivity(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	activityCode := vars["activityCode"]
 	districtId := vars["districtId"]
-	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")	
 	w.WriteHeader(http.StatusOK)
 	rows, err := db.Query("SELECT  id, name from activities where code=?", activityCode)
 	check(err)
@@ -156,7 +156,7 @@ func getDistrictActivity(w http.ResponseWriter, r *http.Request) {
 func getDistrictActivities(w http.ResponseWriter, r *http.Request) {	
 	vars := mux.Vars(r)
 	districtId := vars["districtId"]
-	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")	
 	w.WriteHeader(http.StatusOK)
 	rows, err := db.Query("SELECT activity_id, expenditure from activity_expenditure where district_id=?", districtId)
 	check(err)
@@ -187,6 +187,8 @@ func getDistrict(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	districtId := vars["districtId"]
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	w.WriteHeader(http.StatusOK)
 	rows, err := db.Query("SELECT * from districts WHERE id=?", districtId)
 	check(err)
@@ -204,8 +206,10 @@ func getDistrict(w http.ResponseWriter, r *http.Request) {
 }
 
 func getDistricts(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	w.Header().Set("Content-Type", "application/jsonp;charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+	fmt.Println("right function")
 	rows, err := db.Query("SELECT * from districts")
 	check(err)
 	var district District
