@@ -61,6 +61,7 @@ func main() {
 					if !hasNextRow {
 						_, err = db.Exec("INSERT INTO demographics(school_id, ethnicity, gender, kindergarten, grade_1, grade_2, grade_3, grade_4, grade_5, grade_6, grade_7, grade_8, grade_9, grade_10, grade_11, grade_12, ungr_elem, ungr_sec, total, adult) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?)", id, splitStr[startingIndex], splitStr[startingIndex + 1], splitStr[startingIndex + 2],splitStr[startingIndex + 3], splitStr[startingIndex + 4], splitStr[startingIndex + 5], splitStr[startingIndex + 6], splitStr[startingIndex + 7],splitStr[startingIndex + 8], splitStr[startingIndex + 9], splitStr[startingIndex + 10], splitStr[startingIndex + 11], splitStr[startingIndex + 12], splitStr[startingIndex + 13], splitStr[startingIndex + 14], splitStr[startingIndex + 15], splitStr[startingIndex + 16], splitStr[startingIndex + 17], splitStr[startingIndex + 18])
 					}
+					stmt, err := db.Prepare("INSERT INTO districts(name) VALUES(?)", splitStr[2])
 					check(err)
 				}
 				schoolRows.Close()
