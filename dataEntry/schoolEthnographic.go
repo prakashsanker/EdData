@@ -42,6 +42,7 @@ func main() {
 	for i, row := range(lines) {
 		if i > 1 {
 			line := strings.TrimSpace(row)
+			fmt.Println(line)
 			splitStr := strings.Split(line, ",")
 			if splitStr[3] != "" {
 				schoolRows, err := db.Query("SELECT id from schools where name=?", splitStr[3])
@@ -49,8 +50,7 @@ func main() {
 				// var schoolId sql.Result
 				hasNextRow := schoolRows.Next()
 				if !hasNextRow {
-					_, err = db.Exec("INSERT INTO schools(name) VALUES (?)", splitStr[3])
-					check(err)
+					_, _ = db.Exec("INSERT INTO schools(name) VALUES (?)", splitStr[3])
 				} else {
 					//has a school row
 					var id int
@@ -67,11 +67,9 @@ func main() {
 						check(err)
 					}
 					districtRow, err := db.Query("SELECT id from districts where name=?", strings.TrimSpace(splitStr[2]));
-					fmt.Println(splitStr[2])
 					check(err)
 					hasNextRow = districtRow.Next()
 					districtRow.Close()
-					fmt.Println(hasNextRow)
 					if !hasNextRow {
 						districtResult, err := db.Exec("INSERT INTO districts(name) VALUES(?)", strings.TrimSpace(splitStr[2]))
 						check(err)
@@ -81,20 +79,16 @@ func main() {
 						hasNextRow = districtSchoolRow.Next()
 						districtSchoolRow.Close()
 						if !hasNextRow {
-							fmt.Println(districtId)
-							fmt.Println(id)
 							_, err = db.Exec("INSERT INTO districts_schools_mapping(district_id, school_id) VALUES(?,?)", districtId, id)
 							check(err)
 						}
 					}
 				}
 				schoolRows.Close()
-
 			}
 		}
 	}
 }
-
 
 func check(e error) {
     if e != nil {
