@@ -40,9 +40,6 @@ func main() {
 				splitStr := strings.Split(line, ",")
 				districtName := strings.Replace(splitStr[2], "\"", "", -1)
 				test := "SELECT id from districts where name LIKE \"%" + districtName + "%\""
-				fmt.Println("TEST")
-				fmt.Println(test)
-				fmt.Println(splitStr)
 				districtRow, err := db.Query(test)
 				check(err)
 				hasNextRow := districtRow.Next()
@@ -62,7 +59,6 @@ func main() {
 					fmt.Print("no district")
 					fmt.Println("district name : " + districtName)
 				}
-				fmt.Println("====")
 				districtRow.Close()
 			}
 		}
