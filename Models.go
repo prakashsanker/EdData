@@ -3,6 +3,8 @@ package main
 type District struct {
 	Id int64 `json: "id"`
 	Name string `json: "name"`
+	Schools Schools `json: "schools"`
+	Code string `json: "code"`
 }
 
 type Districts []District
@@ -55,13 +57,6 @@ type EthnicBreakdown struct {
 	UngradedSecondary int64 `json: "ungrSec"`
 	Total int64 `json: "total"`
 	Adult int64 `json: "adult"`
-}
-
-//have this temporary, I really should have a school data type
-type SchoolEthnicityBreakdown struct {
-	Id int64 `json: "id"`
-	Ethnicity string `json: "ethnicity"`
-
 }
 
 type Activities []Activity

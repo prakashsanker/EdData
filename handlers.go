@@ -5,6 +5,7 @@ import (
 	"net/http"
     "github.com/gorilla/mux"
     "encoding/json"
+    "strconv"
 )
 
 //this file really really really really really needs refactoring. 
@@ -196,7 +197,8 @@ func getDistrict(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var name string
 		var id int64
-		err := rows.Scan(&id, &name)
+		var code string
+		err := rows.Scan(&id, &name, &code)
 		check(err)
 		district = District{Id: id, Name: name}
 	}
@@ -232,23 +234,34 @@ func getDistrictDemography(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/jsonp;charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Access-Control-Allow-Origin","*")
-	districtRows, err := db.Query("SELECT * from districts WHERE id=?", districtId)
+	districtRows, err := db.Query("SELECT name from districts WHERE id=?", districtId)
 	check(err)
-	districtSchoolRows, err := db.Query("SELECT school_id from districts_schools_mappings WHERE district_id=?", districtId)
-	check(err)
-	var schoolRows sql.Rows
-	var demographicRows sql.Rows
-	for rows.Next() {
-		var schoolId int64
-		err := districtSchoolRows.Scan(&schoolId)
+	var districtName string
+	for districtRows.Next() {
+		err = districtRows.Scan(&districtName)
 		check(err)
-		schoolRows, err = db.Query("SELECT name FROM schools where id=?", schoolId)
-		
-		demographicRows, err = db.Query("SELECT * from demographics where school_id=?", schoolId)
+	}
+	districtRows.Close()
+	districtSchoolRows, err := db.Query("SELECT school_id from districts_schools_mapping WHERE district_id=?", districtId)
+	check(err)
+	var district District
+	var schools Schools
+	for districtSchoolRows.Next() {
+		//for each school take the id and name
+		var schoolId int64
+		var schoolName string
+		err = districtSchoolRows.Scan(&schoolId)
+		check(err)
+		err := db.QueryRow("SELECT name FROM schools where id=?", schoolId).Scan(&schoolName)
+		check(err)
+		//find the demographics
+		demographicRows, err := db.Query("SELECT * from demographics where school_id=?", schoolId)
 		check(err)
 		var ethnicBreakdowns EthnicBreakdowns
+		var school School
 		for demographicRows.Next() {
 				var id int64
+				var schoolId int64
 				var ethnicity string
 				var gender string
 				var kindergarten int64
@@ -268,14 +281,22 @@ func getDistrictDemography(w http.ResponseWriter, r *http.Request) {
 				var ungradedSecondary int64
 				var total int64
 				var adult int64
-				err := rows.Scan(&id, &ethnicity, &gender, &kindergarten, &grade1, &grade2, &grade3, &grade4, &grade5, &grade6, &grade7, &grade8, &grade9, &grade10, &grade11, &grade12, &ungradedElementary, &ungradedSecondary, &total, &adult)
+				err := demographicRows.Scan(&id, &schoolId, &ethnicity, &gender, &kindergarten, &grade1, &grade2, &grade3, &grade4, &grade5, &grade6, &grade7, &grade8, &grade9, &grade10, &grade11, &grade12, &ungradedElementary, &ungradedSecondary, &total, &adult)
 				check(err)
-				schoolEthnicityBreakdown := EthnicBreakdown{Id: id, Ethnicity: ethnicity, Gender: gender, Kindergarten: kindergarten, Grade1: grade1, Grade2: grade2, Grade3: grade3, Grade4: grade4, Grade5: grade5, Grade6: grade6, Grade7: grade7, Grade8: grade8, Grade9: grade9, Grade10: grade10, Grade11: grade11, Grade12: grade12, UngradedElementary: ungradedElementary, UngradedSecondary: ungradedSecondary, Total: total, Adult: adult}
+				schoolEthnicityBreakdown := EthnicBreakdown{Ethnicity: ethnicity, Gender: gender, Kindergarten: kindergarten, Grade1: grade1, Grade2: grade2, Grade3: grade3, Grade4: grade4, Grade5: grade5, Grade6: grade6, Grade7: grade7, Grade8: grade8, Grade9: grade9, Grade10: grade10, Grade11: grade11, Grade12: grade12, UngradedElementary: ungradedElementary, UngradedSecondary: ungradedSecondary, Total: total, Adult: adult}
 				ethnicBreakdowns = append(ethnicBreakdowns, schoolEthnicityBreakdown)
 			}
+		school = School{Id: schoolId, Name: schoolName, EthnicInfo: ethnicBreakdowns}
+		schools = append(schools, school)
 		demographicRows.Close()
 	}
-	rows.Close()
+	districtSchoolRows.Close()
+	districIdNum, err := strconv.ParseInt(districtId, 10, 64)
+	check(err)
+	district = District{Id: districIdNum, Name: districtName, Schools: schools}
+	if err := json.NewEncoder(w).Encode(district); err != nil {
+		check(err)
+	}
 }
 
 func check(e error) {

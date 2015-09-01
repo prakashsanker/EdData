@@ -31,7 +31,7 @@ func main() {
 	stmt, err := db.Prepare("CREATE TABLE IF NOT EXISTS demographics (id INT(11) NOT NULL AUTO_INCREMENT, school_id INT(11) NOT NULL, ethnicity ENUM('1','2','3','4','5','6','7','8','9'), gender ENUM('F', 'M'), kindergarten INT(11), grade_1 INT(11), grade_2 INT(11), grade_3 INT(11), grade_4 INT(11), grade_5 INT(11), grade_6 INT(11), grade_7 INT(11), grade_8 INT(11), grade_9 INT(11), grade_10 INT(11), grade_11 INT(11), grade_12 INT(11), ungr_elem INT(11), ungr_sec INT(11), total INT(11), adult INT(11), FOREIGN KEY(school_id) REFERENCES schools(id), PRIMARY KEY(id))")
 	check(err)
 	stmt.Exec()
-	stmt, err = db.Prepare("CREATE TABLE IF NOT EXISTS districts (id INT(11) NOT NULL AUTO_INCREMENT, code VARCHAR(25), PRIMARY KEY (id));")
+	stmt, err = db.Prepare("CREATE TABLE IF NOT EXISTS districts (id INT(11) NOT NULL AUTO_INCREMENT, name VARCHAR(255), code VARCHAR(25), PRIMARY KEY (id));")
 	check(err)
 	stmt.Exec()
 	stmt, err = db.Prepare("CREATE TABLE IF NOT EXISTS districts_schools_mapping (id INT(11) NOT NULL AUTO_INCREMENT, district_id INT(11) NOT NULL, school_id INT(11) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(school_id) REFERENCES schools(id));")

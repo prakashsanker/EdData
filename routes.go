@@ -94,6 +94,6 @@ var routes = Routes{
 		"getDistrictDemography",
 		"GET",
 		"/district/{districtId}/demography",
-		getDistrictDemography
-	}
+		getDistrictDemography,
+	},
 }
