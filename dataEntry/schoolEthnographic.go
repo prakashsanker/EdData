@@ -66,13 +66,14 @@ func main() {
 						_, err := db.Exec("INSERT INTO demographics(school_id, ethnicity, gender, kindergarten, grade_1, grade_2, grade_3, grade_4, grade_5, grade_6, grade_7, grade_8, grade_9, grade_10, grade_11, grade_12, ungr_elem, ungr_sec, total, adult) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?)", id, splitStr[startingIndex], splitStr[startingIndex + 1], splitStr[startingIndex + 2],splitStr[startingIndex + 3], splitStr[startingIndex + 4], splitStr[startingIndex + 5], splitStr[startingIndex + 6], splitStr[startingIndex + 7],splitStr[startingIndex + 8], splitStr[startingIndex + 9], splitStr[startingIndex + 10], splitStr[startingIndex + 11], splitStr[startingIndex + 12], splitStr[startingIndex + 13], splitStr[startingIndex + 14], splitStr[startingIndex + 15], splitStr[startingIndex + 16], splitStr[startingIndex + 17], splitStr[startingIndex + 18])
 						check(err)
 					}
-					districtRow, err := db.Query("SELECT id from districts where name=?", splitStr[2]);
+					districtRow, err := db.Query("SELECT id from districts where name=?", strings.TrimSpace(splitStr[2]));
+					fmt.Println(splitStr[2])
 					check(err)
-					fmt.Println(districtRow)
-					districtRow.Close()
 					hasNextRow = districtRow.Next()
+					districtRow.Close()
+					fmt.Println(hasNextRow)
 					if !hasNextRow {
-						districtResult, err := db.Exec("INSERT INTO districts(name) VALUES(?)", splitStr[2])
+						districtResult, err := db.Exec("INSERT INTO districts(name) VALUES(?)", strings.TrimSpace(splitStr[2]))
 						check(err)
 						districtId, err := districtResult.LastInsertId()
 						check(err)
@@ -85,11 +86,7 @@ func main() {
 							_, err = db.Exec("INSERT INTO districts_schools_mapping(district_id, school_id) VALUES(?,?)", districtId, id)
 							check(err)
 						}
-						
 					}
-
-
-
 				}
 				schoolRows.Close()
 
