@@ -90,5 +90,10 @@ var routes = Routes{
 		"/district/{districtId}/subActivities/{subActivityCode}/expenses",
 		getExpenses,
 	},
-
+	Route {
+		"getDistrictDemography",
+		"GET",
+		"/district/{districtId}/demography",
+		getDistrictDemography
+	}
 }

@@ -209,7 +209,6 @@ func getDistricts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/jsonp;charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
     w.Header().Set("Access-Control-Allow-Origin", "*")
-	fmt.Println("right function")
 	rows, err := db.Query("SELECT * from districts")
 	check(err)
 	var district District
@@ -225,6 +224,58 @@ func getDistricts(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(districts); err != nil {
 		check(err)
 	}
+}
+
+func getDistrictDemography(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	districtId := vars["districtId"]
+	w.Header().Set("Content-Type", "application/jsonp;charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Access-Control-Allow-Origin","*")
+	districtRows, err := db.Query("SELECT * from districts WHERE id=?", districtId)
+	check(err)
+	districtSchoolRows, err := db.Query("SELECT school_id from districts_schools_mappings WHERE district_id=?", districtId)
+	check(err)
+	var schoolRows sql.Rows
+	var demographicRows sql.Rows
+	for rows.Next() {
+		var schoolId int64
+		err := districtSchoolRows.Scan(&schoolId)
+		check(err)
+		schoolRows, err = db.Query("SELECT name FROM schools where id=?", schoolId)
+		
+		demographicRows, err = db.Query("SELECT * from demographics where school_id=?", schoolId)
+		check(err)
+		var ethnicBreakdowns EthnicBreakdowns
+		for demographicRows.Next() {
+				var id int64
+				var ethnicity string
+				var gender string
+				var kindergarten int64
+				var grade1 int64
+				var grade2 int64
+				var grade3 int64
+				var grade4 int64
+				var grade5 int64
+				var grade6 int64
+				var grade7 int64
+				var grade8 int64
+				var grade9 int64
+				var grade10 int64
+				var grade11 int64
+				var grade12 int64
+				var ungradedElementary int64
+				var ungradedSecondary int64
+				var total int64
+				var adult int64
+				err := rows.Scan(&id, &ethnicity, &gender, &kindergarten, &grade1, &grade2, &grade3, &grade4, &grade5, &grade6, &grade7, &grade8, &grade9, &grade10, &grade11, &grade12, &ungradedElementary, &ungradedSecondary, &total, &adult)
+				check(err)
+				schoolEthnicityBreakdown := EthnicBreakdown{Id: id, Ethnicity: ethnicity, Gender: gender, Kindergarten: kindergarten, Grade1: grade1, Grade2: grade2, Grade3: grade3, Grade4: grade4, Grade5: grade5, Grade6: grade6, Grade7: grade7, Grade8: grade8, Grade9: grade9, Grade10: grade10, Grade11: grade11, Grade12: grade12, UngradedElementary: ungradedElementary, UngradedSecondary: ungradedSecondary, Total: total, Adult: adult}
+				ethnicBreakdowns = append(ethnicBreakdowns, schoolEthnicityBreakdown)
+			}
+		demographicRows.Close()
+	}
+	rows.Close()
 }
 
 func check(e error) {
