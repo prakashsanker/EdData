@@ -7,6 +7,7 @@ import (
     _ "github.com/go-sql-driver/mysql"
     "fmt"
     "log"
+	// "github.com/rs/cors"
 )
 
 type Route struct {
@@ -24,6 +25,8 @@ var err error
 func NewRouter() *mux.Router {
 	db, err = sql.Open("mysql", "psanker:123@/education_data")
 	err = db.Ping()
+	// c := cors.Default()
+
 
 	if err != nil {
 		fmt.Println("Failed to prepare connection to database")
