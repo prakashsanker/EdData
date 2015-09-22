@@ -15,10 +15,6 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "WELCOME!")
 }
 
-type KarnaServer struct {
-	r *mux.Router
-}
-
 func getExpenses(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	districtId := vars["districtId"]
@@ -211,20 +207,9 @@ func getDistrict(w http.ResponseWriter, r *http.Request) {
 }
 
 func getDistricts(w http.ResponseWriter, r *http.Request) {
-    if origin := r.Header.Get("Origin"); origin != "" {
-        w.Header().Set("Access-Control-Allow-Origin", origin)
-        w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-        w.Header().Set("Access-Control-Allow-Headers",
-            "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-    }
-
-
-	// w.Header().Set("Content-Type", "application/jsonp;charset=UTF-8")
-	// w.WriteHeader(http.StatusOK)
-	// w.Header().Add("Access-Control-Allow-Origin", "https://localhost:8100")
- //    w.Header().Set("Access-Control-Allow-Origin", "*")
-
-
+	w.Header().Set("Content-Type", "application/jsonp;charset=UTF-8")
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)	
 	rows, err := db.Query("SELECT * from districts")
 	check(err)
 	var district District
