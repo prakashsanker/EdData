@@ -151,7 +151,6 @@ func getDistrictActivity(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(activity); err != nil {
 		check(err)
 	}
-
 }
 
 func getDistrictActivities(w http.ResponseWriter, r *http.Request) {	
@@ -218,9 +217,10 @@ func getDistricts(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var id int64
 		var name string
-		err := rows.Scan(&id, &name)
+		var code string
+		err := rows.Scan(&id, &name, &code)
 		check(err)
-		district = District{Id: id, Name: name}
+		district = District{Id: id, Name: name, Code: code}
 		districts = append(districts, district)
 	}
 	if err := json.NewEncoder(w).Encode(districts); err != nil {
