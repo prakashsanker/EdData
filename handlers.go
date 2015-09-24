@@ -227,15 +227,13 @@ func getDistricts(w http.ResponseWriter, r *http.Request) {
 	var expenditure string
 	var currentExpenseAda string
 	var currentExpensePerAda string
-	for _, district := range districts {
-		var id = district.Id
-		fmt.Println("ID")
-		fmt.Println(id)
+	for index, _ := range districts {
+		var id = districts[index].Id
 		err := db.QueryRow("SELECT expenditure, current_expense_ada, current_expense_per_ada FROM district_expenses where district_id=?", id).Scan(&expenditure, &currentExpenseAda, &currentExpensePerAda)
 		if (err == nil) {
-			district.Expenditure = expenditure
-			district.CurrentExpenseADA = currentExpenseAda
-			district.CurrentExpensePerAda = currentExpensePerAda
+			districts[index].Expenditure = expenditure
+			districts[index].CurrentExpenseADA = currentExpenseAda
+			districts[index].CurrentExpensePerAda = currentExpensePerAda
 		} else if (err != sql.ErrNoRows) {
 			check(err)
 		}
