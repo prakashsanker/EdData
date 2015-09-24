@@ -6,6 +6,7 @@ import (
     "github.com/gorilla/mux"
     "encoding/json"
     "strconv"
+	"database/sql"
 )
 
 //this file really really really really really needs refactoring. 
@@ -228,11 +229,16 @@ func getDistricts(w http.ResponseWriter, r *http.Request) {
 	var currentExpensePerAda string
 	for _, district := range districts {
 		var id = district.Id
+		fmt.Println("ID")
+		fmt.Println(id)
 		err := db.QueryRow("SELECT expenditure, current_expense_ada, current_expense_per_ada FROM district_expenses where district_id=?", id).Scan(&expenditure, &currentExpenseAda, &currentExpensePerAda)
-		check(err)
-		district.Expenditure = expenditure
-		district.currentExpenseAda = currentExpenseAda
-		district.currentExpensePerAda = currentExpensePerAda
+		if (err == nil) {
+			district.Expenditure = expenditure
+			district.CurrentExpenseADA = currentExpenseAda
+			district.CurrentExpensePerAda = currentExpensePerAda
+		} else if (err != sql.ErrNoRows) {
+			check(err)
+		}
 	}
 	if err := json.NewEncoder(w).Encode(districts); err != nil {
 		check(err)
