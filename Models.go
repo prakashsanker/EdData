@@ -5,6 +5,9 @@ type District struct {
 	Name string `json:"name"`
 	Schools Schools `json:"schools"`
 	Code string `json:"code"`
+	Expenditure string `json:"expenditure"`
+	CurrentExpenseADA string `json:"currentExpenseAda"`
+	CurrentExpensePerAda string `json:"currentExpensePerAda"`
 }
 
 type Districts []District

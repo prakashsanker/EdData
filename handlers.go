@@ -223,6 +223,17 @@ func getDistricts(w http.ResponseWriter, r *http.Request) {
 		district = District{Id: id, Name: name, Code: code}
 		districts = append(districts, district)
 	}
+	var expenditure string
+	var currentExpenseAda string
+	var currentExpensePerAda string
+	for _, district := range districts {
+		var id = district.Id
+		err := db.QueryRow("SELECT expenditure, current_expense_ada, current_expense_per_ada FROM district_expenses where district_id=?", id).Scan(&expenditure, &currentExpenseAda, &currentExpensePerAda)
+		check(err)
+		district.Expenditure = expenditure
+		district.currentExpenseAda = currentExpenseAda
+		district.currentExpensePerAda = currentExpensePerAda
+	}
 	if err := json.NewEncoder(w).Encode(districts); err != nil {
 		check(err)
 	}
