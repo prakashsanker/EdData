@@ -16,7 +16,7 @@ type Activity struct {
 	Id int64 `json:"id"`
 	Code string `json:"code"`
 	Expenditure string `json:"expenditure" `
-	Name string `json :"name"`
+	Name string `json:"name"`
 }
 
 type SubActivity struct {
